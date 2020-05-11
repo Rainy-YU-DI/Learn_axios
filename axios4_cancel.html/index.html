@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button onclick="getProduction()">獲取商品列表1</button>
+    <button onclick="cancelReq()">取消請求</button>
+    <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
+    <!--取消請求:
+    1.基本流程:
+    1)配置cancelToken對象
+    2)在還沒完成請求前先暫存用於請求取消的cancel函數
+    3)在後面特定時機調用cancel函數取消請求
+    4)在錯誤回調中判斷錯誤是error引起(平常是error對象:會有message和stack)還是cancel引起(不會有stack，是cancel對象)
+    5)暫存用於請求取消的cancel函數在請求完成後要被設回null，因為後面不需要了
+    -->
+    <script>
+      let cancel; //用於保存"取消請求的函數"
+      function getProduction() {
+        //再準備發請求前，取消未完成的請求
+        if (typeof cancel === 'function') {
+          cancel('取消請求');
+        }
+
+        axios({
+          url: 'http://localhost:4000/products1',
+          cancelToken: new axios.CancelToken(c => {
+            //c是用於取消當前請求的函數
+            //保存取消函數，用於之後可能需要取消當前請求
+            cancel = c;
+          }),
+        }).then(
+          response => {
+            cancel = null;
+            console.log('請求1成功了', response.data);
+          },
+          error => {
+            cancel = null;
+            console.log('請求1失敗了', error.message);
+          },
+        );
+      }
+
+      function cancelReq() {
+        //執行取消請求的函數
+        if (typeof cancel === 'function') {
+          cancel('強制取消請求');
+        } else {
+          console.log('沒有可取消的請求');
+        }
+      }
+    </script>
+  </body>
+</html>

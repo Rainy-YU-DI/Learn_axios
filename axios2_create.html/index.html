@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
+
+  <body>
+    <!--
+      1)axios.create(config)
+      a.根據指定配置創建一個新的axios，也就是每個新的axios都有自己的配置
+      b.新axios只是沒有取消請求和批量發請求的方法，其他所有語法都是一致的
+      c.為什麼要設計這類與法?
+      需求:項目中有部分接口需要的配置與吝一部分的接口需要的配置不同，如何處理
+      解決:創建2個新的axios,每個都有自己的配置，分別應用到不同要求的接口請求中
+    -->
+    <script>
+      //只能使用一個配置
+      axios.defaults.baseURL = 'http://localhost:3000';
+      axios({
+        url: '/posts',
+      });
+
+      //根據指定配置創建一個新的axios，也就是每個新的axios都有自己的配置
+      const instance = axios.create({
+        baseURL: 'http://localhost:3000',
+      });
+      //使用instance(擁有axios功能的函數)發請求
+      instance({
+        url: '/posts',
+      });
+      //使用instance(對象)發請求
+      instance.get('/posts');
+    </script>
+  </body>
+</html>

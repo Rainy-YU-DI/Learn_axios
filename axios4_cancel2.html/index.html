@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button onclick="getProduction1()">獲取商品列表1</button>
+    <button onclick="getProduction2()">獲取商品列表2</button>
+    <button onclick="cancelReq()">取消請求</button>
+    <script src="https://cdn.bootcss.com/axios/0.19.0/axios.js"></script>
+
+    <script>
+      let cancel; //用於保存"取消請求的函數"
+      function getProduction1() {
+        //再準備發請求前，取消未完成的請求
+        if (typeof cancel === 'function') {
+          cancel('取消請求');
+        }
+        axios({
+          url: 'http://localhost:4000/products1',
+          cancelToken: new axios.CancelToken(c => {
+            //c是用於取消當前請求的函數
+            //保存取消函數，用於之後可能需要取消當前請求
+            cancel = c;
+          }),
+        }).then(
+          response => {
+            cancel = null;
+            console.log('請求1成功了', response.data);
+          },
+          error => {
+            //異步回調
+            if (axios.isCancel(error)) {
+              //cancel=null 這邊不能將cancel變null
+              console.log('請求1取消的錯誤', error.message);
+            } else {
+              //請求出錯了
+              cancel = null;
+              console.log('請求1失敗了', error.message);
+            }
+          },
+        );
+      }
+
+      function getProduction2() {
+        //再準備發請求前，取消未完成的請求
+        if (typeof cancel === 'function') {
+          cancel('取消請求');
+        }
+        axios({
+          url: 'http://localhost:4000/products2',
+          cancelToken: new axios.CancelToken(c => {
+            //c是用於取消當前請求的函數
+            //保存取消函數，用於之後可能需要取消當前請求
+            cancel = c;
+          }),
+        }).then(
+          response => {
+            cancel = null;
+            console.log('請求2成功了', response.data);
+          },
+          error => {
+            //異步回調
+            if (axios.isCancel(error)) {
+              //cancel=null 這邊不能將cancel變null
+              console.log('請求2取消的錯誤', error.message);
+            } else {
+              //請求出錯了
+              cancel = null;
+              console.log('請求2失敗了', error.message);
+            }
+          },
+        );
+      }
+
+      function cancelReq() {
+        //執行取消請求的函數
+        if (typeof cancel === 'function') {
+          cancel('強制取消請求');
+        } else {
+          console.log('沒有可取消的請求');
+        }
+      }
+    </script>
+  </body>
+</html>
